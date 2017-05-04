@@ -1,5 +1,4 @@
 var express = require('express')
-var cors = require('cors')
 var app = express()
 
 app.set('port', (process.env.PORT || 3000))
