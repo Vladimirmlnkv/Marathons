@@ -8,7 +8,6 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      placeUrl: "",
       name: "",
       place: "",
       date: "",
@@ -21,8 +20,7 @@ class App extends Component {
       arrivalDate: "",
       departureDate: "",
       visa: "",
-      text: "",
-      textGenerated: false,
+      text: ""
     }
 
     this.changeField = this.changeField.bind(this)
@@ -38,25 +36,35 @@ class App extends Component {
 
   generateText(event) {
     event.preventDefault()
-    // this.setState({textGenerated: true})
     var baseUrl = "https://search.aviasales.ru/"
     Api.fetchCities().then((data) => {
       var toCity = _.find(data, (el) => {return el.name_translations.ru === this.state.toCity})
       if (toCity === undefined) {
         alert("Некорректно введен город проведения марафона!")
       } else {      
-        var moscowCode = _.find(data, (el) => {return el.name_translations.ru === "Москва"}).code
-        var piterCode = _.find(data, (el) => {return el.name_translations.ru === "Санкт-Петербург"}).code
-        var kazanCode = _.find(data, (el) => {return el.name_translations.ru === "Казань"}).code
-        var fromMoscowUrl = baseUrl + moscowCode + this.state.arrivalDate + toCity.code + this.state.departureDate + '1' + this.state.flightMarker
-        var fromPiterUrl = baseUrl + piterCode + this.state.arrivalDate + toCity.code + this.state.departureDate + '1' + this.state.flightMarker
-        var fromKazanUrl = baseUrl + kazanCode + this.state.arrivalDate + toCity.code + this.state.departureDate + '1' + this.state.flightMarker
+        Api.getCityId(toCity.name_translations.en).then((id) => {
 
-        var text = this.state.name + "\n" + this.state.place + "\n\nДата мероприятия: " + this.state.date + "\nCтартовый взнос: " 
-        + this.state.price + "\n\n" + this.state.site + "\n" + this.state.visa + "\n\nВыезд из:\nМосквы: " + fromMoscowUrl 
-        + "\nПитера: " + fromPiterUrl + "\nКазани: " + fromKazanUrl + "\n\nПроживание: " + this.state.placeUrl + this.state.hotelMarker
-        this.setState({
-          text: text
+          var moscowCode = _.find(data, (el) => {return el.name_translations.ru === "Москва"}).code
+          var piterCode = _.find(data, (el) => {return el.name_translations.ru === "Санкт-Петербург"}).code
+          var kazanCode = _.find(data, (el) => {return el.name_translations.ru === "Казань"}).code
+
+          var arrivalComponents = this.state.arrivalDate.split('-')
+          var ticketsArrivalDate = arrivalComponents[2] + arrivalComponents[1]
+          var departureComponents = this.state.departureDate.split('-')
+          var ticketsDepartureDate = departureComponents[2] + departureComponents[1]
+
+          var fromMoscowUrl = baseUrl + moscowCode + ticketsArrivalDate + toCity.code + ticketsDepartureDate + '1' + this.state.flightMarker
+          var fromPiterUrl = baseUrl + piterCode + ticketsArrivalDate + toCity.code + ticketsDepartureDate + '1' + this.state.flightMarker
+          var fromKazanUrl = baseUrl + kazanCode + ticketsArrivalDate + toCity.code + ticketsDepartureDate + '1' + this.state.flightMarker
+
+          var hotelUrl = "https://search.hotellook.com/?locationId=" + id + "&checkIn=" + this.state.arrivalDate + "&checkOut=" + this.state.departureDate + "&adults=1&language=ru-RU&currency=RUB&marker=87783"
+
+          var text = this.state.name + "\n" + this.state.place + "\n\nДата мероприятия: " + this.state.date + "\nCтартовый взнос: " 
+          + this.state.price + "\n\n" + this.state.site + "\n" + this.state.visa + "\n\nВыезд из:\nМосквы: " + fromMoscowUrl 
+          + "\nПитера: " + fromPiterUrl + "\nКазани: " + fromKazanUrl + "\n\nПроживание: " + hotelUrl
+          this.setState({
+            text: text
+          })
         })
       }
     })
@@ -94,9 +102,6 @@ class App extends Component {
           </label>
           <label onChange={this.changeField}>
             <input className="TextInput" type="text" name="departureDate" placeholder="Дата обратно" value={this.state.departureDate}/>
-          </label>
-          <label onChange={this.changeField}>
-            <input className="TextInput" type="text" name="placeUrl" placeholder="Отель" value={this.state.placeUrl}/>
           </label>
           <button onClick={this.generateText}>Сгенерировать текст</button>
         </form>

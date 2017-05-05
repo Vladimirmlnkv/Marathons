@@ -7,7 +7,15 @@ class AviasalesApi {
             },
         })
         .then((data) => { return data.json() })
-        .then((data) => {return data})
+        .then((data) => { return data})
+        .catch((error) => {console.log(error)})
+    }
+
+    getCityId(city) {
+        var url = "http://engine.hotellook.com/api/v2/lookup.json?query="+city+"&lang=ru&lookFor=both&limit=1"
+        return fetch(url)
+        .then((data) => {return data.json()})
+        .then((data) => {return data.results.locations[0].id})
         .catch((error) => {console.log(error)})
     }
 
