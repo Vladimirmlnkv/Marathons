@@ -17,3 +17,26 @@ input.focus {
   border: solid 1px #707070;
   box-shadow: 0 0 5px 1px #969696;
 }
+
+form {
+  padding-bottom: 10px;
+}
+
+.Button {
+    background-color: coral;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.Button:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+.Button:focus, input[type="button"]:focus {
+    outline: none;
+}

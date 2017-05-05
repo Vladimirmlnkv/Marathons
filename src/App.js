@@ -75,7 +75,7 @@ class App extends Component {
       <div className="App">
         <form>
           <label onChange={this.changeField}>
-            <input className="TextInput" type="text" name="name" placeholder="Название" value={this.state.name}/>
+            <input className="TextInput" type="textarea" name="name" placeholder="Название" value={this.state.name}/>
           </label>
           <label onChange={this.changeField}>
             <input className="TextInput" type="text" name="place" placeholder="Место проведения" value={this.state.place}/>
@@ -103,8 +103,9 @@ class App extends Component {
           <label onChange={this.changeField}>
             <input className="TextInput" type="text" name="departureDate" placeholder="Дата обратно" value={this.state.departureDate}/>
           </label>
-          <button onClick={this.generateText}>Сгенерировать текст</button>
+          
         </form>
+        <button className="Button" onClick={this.generateText}>Сгенерировать текст</button>
         <div className="Text">
           <p style={{whiteSpace: 'pre-wrap'}}>{this.state.text}</p>
         </div>
