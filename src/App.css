@@ -31,6 +31,8 @@ form {
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    border-radius: 20px;
 }
 
 .Button:hover {
