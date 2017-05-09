@@ -42,3 +42,7 @@ form {
 .Button:focus, input[type="button"]:focus {
     outline: none;
 }
+
+.SubmitButton {
+  padding-top: 10px;
+}

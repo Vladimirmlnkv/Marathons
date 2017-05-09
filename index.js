@@ -16,7 +16,17 @@ app.get('/api/cities', (req, resp) => {
     request(url, (error, response, body) => {
         var data = JSON.parse(body)
 
-        var toCity = _.find(data, (el) => {return el.name_translations.ru === destinationCity})
+        var toCity = _.find(data, (el) => {
+            var ru = el.name_translations.ru
+            if (ru === undefined) { return false}
+            return ru.toUpperCase() === destinationCity.toUpperCase()
+        })
+        if (toCity === undefined) {
+            resp.send({
+                error: "Not found",
+            })
+            return
+        }
         var destinationCode = toCity.code
         var englishName = toCity.name_translations.en
 
@@ -33,6 +43,7 @@ app.get('/api/cities', (req, resp) => {
                 englishName: englishName 
             }
         }
+        
         resp.send(respJson)
     })
 })
