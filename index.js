@@ -1,6 +1,7 @@
 var express = require('express')
 var app = express()
 var request = require('request')
+var _ = require('lodash')
 
 app.set('port', (process.env.PORT || 3000))
 app.use(express.static(__dirname + "/build"))
@@ -11,8 +12,28 @@ app.get('/', function(request, response) {
 
 app.get('/api/cities', (req, resp) => {
     var url = "http://api.travelpayouts.com/data/cities.json?token=37813cee19f8d2cc2635c26382fddb24"
+    var destinationCity = req.query.destinationCity
     request(url, (error, response, body) => {
-        resp.send(body)
+        var data = JSON.parse(body)
+
+        var toCity = _.find(data, (el) => {return el.name_translations.ru === destinationCity})
+        var destinationCode = toCity.code
+        var englishName = toCity.name_translations.en
+
+        var moscowCode = _.find(data, (el) => {return el.name_translations.ru === "Москва"}).code
+        var piterCode = _.find(data, (el) => {return el.name_translations.ru === "Санкт-Петербург"}).code
+        var kazanCode = _.find(data, (el) => {return el.name_translations.ru === "Казань"}).code
+
+        var respJson = {
+            moscowCode: moscowCode,
+            piterCode: piterCode,
+            kazanCode: kazanCode,
+            destinationCity: {
+                code: destinationCode,
+                englishName: englishName 
+            }
+        }
+        resp.send(respJson)
     })
 })
 

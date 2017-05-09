@@ -26,7 +26,7 @@ class App extends Component {
     this.changeField = this.changeField.bind(this)
     this.generateText = this.generateText.bind(this)
   }
-
+  
   changeField(event) {
     var key = event.target.name.toString()
     this.setState({
@@ -37,25 +37,25 @@ class App extends Component {
   generateText(event) {
     event.preventDefault()
     var baseUrl = "https://search.aviasales.ru/"
-    Api.fetchCities().then((data) => {
-      var toCity = _.find(data, (el) => {return el.name_translations.ru === this.state.toCity})
+    Api.fetchCities(this.state.toCity).then((data) => {
+      var toCity = data.destinationCity.code
       if (toCity === undefined) {
         alert("Некорректно введен город проведения марафона!")
       } else {      
-        Api.getCityId(toCity.name_translations.en).then((id) => {
+        Api.getCityId(data.destinationCity.englishName).then((id) => {
 
-          var moscowCode = _.find(data, (el) => {return el.name_translations.ru === "Москва"}).code
-          var piterCode = _.find(data, (el) => {return el.name_translations.ru === "Санкт-Петербург"}).code
-          var kazanCode = _.find(data, (el) => {return el.name_translations.ru === "Казань"}).code
+          var moscowCode = data.moscowCode
+          var piterCode = data.piterCode
+          var kazanCode = data.kazanCode
 
           var arrivalComponents = this.state.arrivalDate.split('-')
           var ticketsArrivalDate = arrivalComponents[2] + arrivalComponents[1]
           var departureComponents = this.state.departureDate.split('-')
           var ticketsDepartureDate = departureComponents[2] + departureComponents[1]
 
-          var fromMoscowUrl = baseUrl + moscowCode + ticketsArrivalDate + toCity.code + ticketsDepartureDate + '1' + this.state.flightMarker
-          var fromPiterUrl = baseUrl + piterCode + ticketsArrivalDate + toCity.code + ticketsDepartureDate + '1' + this.state.flightMarker
-          var fromKazanUrl = baseUrl + kazanCode + ticketsArrivalDate + toCity.code + ticketsDepartureDate + '1' + this.state.flightMarker
+          var fromMoscowUrl = baseUrl + moscowCode + ticketsArrivalDate + toCity + ticketsDepartureDate + '1' + this.state.flightMarker
+          var fromPiterUrl = baseUrl + piterCode + ticketsArrivalDate + toCity + ticketsDepartureDate + '1' + this.state.flightMarker
+          var fromKazanUrl = baseUrl + kazanCode + ticketsArrivalDate + toCity + ticketsDepartureDate + '1' + this.state.flightMarker
 
           var hotelUrl = "https://search.hotellook.com/?locationId=" + id + "&checkIn=" + this.state.arrivalDate + "&checkOut=" + this.state.departureDate + "&adults=1&language=ru-RU&currency=RUB&marker=87783"
 
