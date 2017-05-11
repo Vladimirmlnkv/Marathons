@@ -2,13 +2,11 @@
   padding: 20px;
 }
 label {
-    padding-top: 10px;
-    padding-right: 10px;
-    padding-bottom: 10px;
+  padding-right: 10px;
 }
 
 input {
-  padding: 10px;
+  padding: 17px;
   border: solid 1px #dcdcdc;
   transition: box-shadow 0.3s, border 0.3s;
 }
@@ -19,14 +17,14 @@ input.focus {
 }
 
 form {
-  padding-bottom: 10px;
+  padding-bottom: 20px;
 }
 
 .Button {
     background-color: coral;
     border: none;
     color: white;
-    padding: 8px 16px;
+    padding: 10px 16px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -44,5 +42,9 @@ form {
 }
 
 .SubmitButton {
-  padding-top: 10px;
+  padding-top: 20px;
+}
+
+.DatePickerContainter {
+  padding-left: 2px; 
 }

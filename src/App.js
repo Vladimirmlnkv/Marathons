@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 import Api from './servises/AviasalesApi.js'
+import { DateRangePicker } from 'react-dates';
+import 'react-dates/lib/css/_datepicker.css';
 
 class App extends Component {
 
@@ -16,10 +18,8 @@ class App extends Component {
       marahtonSite: "",
       fromCity: "",
       toCity: "",
-      arrivalDate: "",
-      departureDate: "",
       visa: "",
-      text: ""
+      text: "",
     }
 
     this.changeField = this.changeField.bind(this)
@@ -33,35 +33,35 @@ class App extends Component {
     })
   }
 
-  _inputsFilled() {
-
-  }
-
   generateText(event) {
     event.preventDefault()
     var baseUrl = "https://search.aviasales.ru/"
     Api.fetchCities(this.state.toCity).then((data) => {
       if (data.error !== undefined) {
         alert("Некорректно введен город проведения марафона!")
+        this.setState({text: ""})
         return
       }
       var toCity = data.destinationCity.code      
       Api.getCityId(data.destinationCity.englishName).then((id) => {
 
+        var ticketsDateFormat = "DDMM"
+        var hotelsDateFormat = "YYYY-MM-DD"
+        var ticketsStartDate = this.state.startDate.format(ticketsDateFormat)
+        var ticketsEndDate = this.state.endDate.format(ticketsDateFormat)
+
+        var hotelStartDate = this.state.startDate.format(hotelsDateFormat)
+        var hotelEndDate = this.state.endDate.format(hotelsDateFormat)
+
         var moscowCode = data.moscowCode
         var piterCode = data.piterCode
         var kazanCode = data.kazanCode
 
-        var arrivalComponents = this.state.arrivalDate.split('-')
-        var ticketsArrivalDate = arrivalComponents[2] + arrivalComponents[1]
-        var departureComponents = this.state.departureDate.split('-')
-        var ticketsDepartureDate = departureComponents[2] + departureComponents[1]
+        var fromMoscowUrl = baseUrl + moscowCode + ticketsStartDate + toCity + ticketsEndDate + '1' + this.state.flightMarker
+        var fromPiterUrl = baseUrl + piterCode + ticketsStartDate + toCity + ticketsEndDate + '1' + this.state.flightMarker
+        var fromKazanUrl = baseUrl + kazanCode + ticketsStartDate + toCity + ticketsEndDate + '1' + this.state.flightMarker
 
-        var fromMoscowUrl = baseUrl + moscowCode + ticketsArrivalDate + toCity + ticketsDepartureDate + '1' + this.state.flightMarker
-        var fromPiterUrl = baseUrl + piterCode + ticketsArrivalDate + toCity + ticketsDepartureDate + '1' + this.state.flightMarker
-        var fromKazanUrl = baseUrl + kazanCode + ticketsArrivalDate + toCity + ticketsDepartureDate + '1' + this.state.flightMarker
-
-        var hotelUrl = "https://search.hotellook.com/?locationId=" + id + "&checkIn=" + this.state.arrivalDate + "&checkOut=" + this.state.departureDate + "&adults=1&language=ru-RU&currency=RUB&marker=87783"
+        var hotelUrl = "https://search.hotellook.com/?locationId=" + id + "&checkIn=" + hotelStartDate + "&checkOut=" + hotelEndDate + "&adults=1&language=ru-RU&currency=RUB&marker=87783"
 
         var text = this.state.name + "\n" + this.state.place + "\n\nДата мероприятия: " + this.state.date + "\nCтартовый взнос: " 
         + this.state.price + "\n\n" + this.state.site + "\n" + this.state.visa + "\n\nВыезд из:\nМосквы: " + fromMoscowUrl 
@@ -100,12 +100,16 @@ class App extends Component {
           <label onChange={this.changeField}>
             <input className="TextInput" type="text" name="toCity" placeholder="Куда летим" value={this.state.toCity} required/>
           </label>
-          <label onChange={this.changeField}>
-            <input className="TextInput" type="text" name="arrivalDate" placeholder="Дата туда" value={this.state.arrivalDate} required/>
-          </label>
-          <label onChange={this.changeField}>
-            <input className="TextInput" type="text" name="departureDate" placeholder="Дата обратно" value={this.state.departureDate} required/>
-          </label>
+          <div className="DatePickerContainter">
+            <DateRangePicker
+              startDate={this.state.startDate}
+              endDate={this.state.endDate}
+              onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })}
+              focusedInput={this.state.focusedInput} 
+              onFocusChange={focusedInput => this.setState({ focusedInput })}
+              required
+            />
+          </div>
           <div className="SubmitButton">
             <button className="Button">Сгенерировать текст</button>
           </div>  
