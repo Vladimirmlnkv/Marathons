@@ -3,6 +3,8 @@ import './App.css';
 import Api from './servises/AviasalesApi.js'
 import { DateRangePicker } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
+import AutocompleteField from './components/AutocompleteField.js'
+import _ from 'lodash'
 
 class App extends Component {
 
@@ -20,10 +22,21 @@ class App extends Component {
       toCity: "",
       visa: "",
       text: "",
+      city: "",
+      cities: []
     }
 
     this.changeField = this.changeField.bind(this)
     this.generateText = this.generateText.bind(this)
+  }
+
+  componentDidMount() {
+    Api.fetchCities().then((data) => {
+      console.log(data)
+      this.setState({
+        cities: data,
+      })
+    })
   }
   
   changeField(event) {
@@ -36,14 +49,20 @@ class App extends Component {
   generateText(event) {
     event.preventDefault()
     var baseUrl = "https://search.aviasales.ru/"
-    Api.fetchCities(this.state.toCity).then((data) => {
-      if (data.error !== undefined) {
-        alert("Некорректно введен город проведения марафона!")
-        this.setState({text: ""})
+
+    if (this.state.cities.length === 0) {
+      alert("Попробуйте позже")
+    } else {
+      
+      var toCity = _.find(this.state.cities, (el) => {
+        if (el.ru === undefined) { return false }
+        return el.ru.toLowerCase() === this.state.city.toLowerCase()
+      })
+      if (toCity === undefined) {
+        alert("Неверный город!")
         return
-      }
-      var toCity = data.destinationCity.code      
-      Api.getCityId(data.destinationCity.englishName).then((id) => {
+      }    
+      Api.getCityId(toCity.en).then((id) => {
 
         var ticketsDateFormat = "DDMM"
         var hotelsDateFormat = "YYYY-MM-DD"
@@ -53,13 +72,13 @@ class App extends Component {
         var hotelStartDate = this.state.startDate.format(hotelsDateFormat)
         var hotelEndDate = this.state.endDate.format(hotelsDateFormat)
 
-        var moscowCode = data.moscowCode
-        var piterCode = data.piterCode
-        var kazanCode = data.kazanCode
+        var moscowCode = _.find(this.state.cities, (el) => { return el.ru === 'Москва'}).code
+        var piterCode = _.find(this.state.cities, (el) => { return el.ru === 'Санкт-Петербург'}).code
+        var kazanCode = _.find(this.state.cities, (el) => { return el.ru === 'Казань'}).code
 
-        var fromMoscowUrl = baseUrl + moscowCode + ticketsStartDate + toCity + ticketsEndDate + '1' + this.state.flightMarker
-        var fromPiterUrl = baseUrl + piterCode + ticketsStartDate + toCity + ticketsEndDate + '1' + this.state.flightMarker
-        var fromKazanUrl = baseUrl + kazanCode + ticketsStartDate + toCity + ticketsEndDate + '1' + this.state.flightMarker
+        var fromMoscowUrl = baseUrl + moscowCode + ticketsStartDate + toCity.code + ticketsEndDate + '1' + this.state.flightMarker
+        var fromPiterUrl = baseUrl + piterCode + ticketsStartDate + toCity.code + ticketsEndDate + '1' + this.state.flightMarker
+        var fromKazanUrl = baseUrl + kazanCode + ticketsStartDate + toCity.code + ticketsEndDate + '1' + this.state.flightMarker
 
         var hotelUrl = "https://search.hotellook.com/?locationId=" + id + "&checkIn=" + hotelStartDate + "&checkOut=" + hotelEndDate + "&adults=1&language=ru-RU&currency=RUB&marker=87783"
 
@@ -70,7 +89,7 @@ class App extends Component {
           text: text
         })
       })
-    })
+    }
   }
 
   render() {
@@ -96,11 +115,14 @@ class App extends Component {
           <label onChange={this.changeField}>
             <input className="TextInput" type="text" name="visa" placeholder="Виза" value={this.state.visa} required/>
           </label>
-          <br></br>
-          <label onChange={this.changeField}>
-            <input className="TextInput" type="text" name="toCity" placeholder="Куда летим" value={this.state.toCity} required/>
-          </label>
+          <br></br>      
           <div className="DatePickerContainter">
+            <AutocompleteField
+              placeholder="Город"
+              cities={this.state.cities}
+              value={this.state.city}
+              onChange={value => this.setState({city: value})}
+            />
             <DateRangePicker
               startDate={this.state.startDate}
               endDate={this.state.endDate}

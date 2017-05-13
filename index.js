@@ -12,39 +12,24 @@ app.get('/', function(request, response) {
 
 app.get('/api/cities', (req, resp) => {
     var url = "http://api.travelpayouts.com/data/cities.json?token=37813cee19f8d2cc2635c26382fddb24"
-    var destinationCity = req.query.destinationCity
     request(url, (error, response, body) => {
         var data = JSON.parse(body)
-
-        var toCity = _.find(data, (el) => {
-            var ru = el.name_translations.ru
-            if (ru === undefined) { return false}
-            return ru.toUpperCase() === destinationCity.toUpperCase()
-        })
-        if (toCity === undefined) {
-            resp.send({
-                error: "Not found",
-            })
-            return
-        }
-        var destinationCode = toCity.code
-        var englishName = toCity.name_translations.en
-
-        var moscowCode = _.find(data, (el) => {return el.name_translations.ru === "Москва"}).code
-        var piterCode = _.find(data, (el) => {return el.name_translations.ru === "Санкт-Петербург"}).code
-        var kazanCode = _.find(data, (el) => {return el.name_translations.ru === "Казань"}).code
-
-        var respJson = {
-            moscowCode: moscowCode,
-            piterCode: piterCode,
-            kazanCode: kazanCode,
-            destinationCity: {
-                code: destinationCode,
-                englishName: englishName 
-            }
-        }
         
-        resp.send(respJson)
+        var cities = _.map(data, (city) => {
+            var object = {
+                code: city.code,
+            }
+            var ru = city.name_translations.ru
+            var en = city.name_translations.en
+            if (ru !== undefined) {
+                object.ru = ru
+            }
+            if (en !== undefined) {
+                object.en = en
+            }
+            return object
+        })
+        resp.send(cities)
     })
 })
 

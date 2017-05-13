@@ -1,7 +1,7 @@
 class AviasalesApi {
 
-    fetchCities(destinationCity) {
-        return fetch("/api/cities?destinationCity=" + destinationCity)
+    fetchCities() {
+        return fetch("/api/cities")
         .then((data) => {return data.json()})
         .then((data) => { return data})
         .catch((error) => { return error })
