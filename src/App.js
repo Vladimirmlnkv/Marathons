@@ -23,7 +23,8 @@ class App extends Component {
       visa: "",
       text: "",
       city: "",
-      cities: []
+      cities: [],
+      isLoading: true
     }
 
     this.changeField = this.changeField.bind(this)
@@ -32,9 +33,9 @@ class App extends Component {
 
   componentDidMount() {
     Api.fetchCities().then((data) => {
-      console.log(data)
       this.setState({
         cities: data,
+        isLoading: false,
       })
     })
   }
@@ -61,7 +62,8 @@ class App extends Component {
       if (toCity === undefined) {
         alert("Неверный город!")
         return
-      }    
+      }
+      this.setState({isLoading: true})    
       Api.getCityId(toCity.en).then((id) => {
 
         var ticketsDateFormat = "DDMM"
@@ -86,16 +88,20 @@ class App extends Component {
         + this.state.price + "\n\n" + this.state.site + "\n" + this.state.visa + "\n\nВыезд из:\nМосквы: " + fromMoscowUrl 
         + "\nПитера: " + fromPiterUrl + "\nКазани: " + fromKazanUrl + "\n\nПроживание: " + hotelUrl
         this.setState({
-          text: text
+          text: text,
+          isLoading: false
         })
       })
     }
   }
 
   render() {
+
+    const onSubmit = this.state.isLoading ? e => e.preventDefault : this.generateText
+
     return (
       <div className="App">
-        <form onSubmit={this.generateText}>
+        <form onSubmit={onSubmit}>
           <label onChange={this.changeField}>
             <input className="TextInput" type="textarea" name="name" placeholder="Название" value={this.state.name} required/>
           </label>
@@ -133,7 +139,7 @@ class App extends Component {
             />
           </div>
           <div className="SubmitButton">
-            <button className="Button">Сгенерировать текст</button>
+            <button className="Button" disabled={this.state.isLoading}>Сгенерировать текст</button>
           </div>  
         </form>
         <div className="Text">

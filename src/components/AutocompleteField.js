@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
-import Autosuggest from 'react-autosuggest';
+import React, { Component } from 'react'
+import Autosuggest from 'react-autosuggest'
+import _ from 'lodash'
 
 class AutocompleteField extends Component {
 
@@ -35,8 +36,8 @@ class AutocompleteField extends Component {
 	getSuggestions = value => {
 		const inputValue = value.trim().toLowerCase()
 		const inputLength = inputValue.length
-		console.log(this.props.cities)
-		return inputLength === 0 ? [] : this.props.cities.filter(city => {
+
+		return inputLength === 0 ? [] : _.filter(this.props.cities, (city) => {
 			if (city.ru === undefined) {return false} 
 			return city.ru.toLowerCase().slice(0, inputLength) === inputValue
 		})
