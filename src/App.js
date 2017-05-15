@@ -48,6 +48,14 @@ class App extends Component {
     this.setState({city})
   }
 
+  changeFocus = (focusedInput) => {
+    this.setState({ focusedInput })
+  }
+
+  onDateChange = ({startDate, endDate}) => {
+    this.setState({startDate, endDate})
+  }
+
   generateText = (event) => {
     event.preventDefault()
     var baseUrl = "https://search.aviasales.ru/"
@@ -129,9 +137,9 @@ class App extends Component {
             <DateRangePicker
               startDate={this.state.startDate}
               endDate={this.state.endDate}
-              onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })}
+              onDatesChange={this.onDateChange}
               focusedInput={this.state.focusedInput} 
-              onFocusChange={focusedInput => this.setState({ focusedInput })}
+              onFocusChange={this.changeFocus}
               required
             />
           </div>
